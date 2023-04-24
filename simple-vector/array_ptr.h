@@ -4,33 +4,45 @@
 template <typename Type>
 class ArrayPtr {
 public:
+	/*
 	using iterator_category = std::bidirectional_iterator_tag;
 	using value_type = Type;
 	using difference_type = std::ptrdiff_t;
 	using reference = Type&;
 	using pointer = Type*;
-
+	*/
 	template<typename U>
 	friend class ArrayPtr;
 
-	ArrayPtr(Type* inp) noexcept : data(inp) {}
-	ArrayPtr(const ArrayPtr& inp) noexcept : data(inp.data) {}
-	ArrayPtr(ArrayPtr&& inp) noexcept : data(std::move(inp.data)) {}
-	//ArrayPtr(size_t size) noexcept : data(new Type[size]) {}
-	//ArrayPtr(std::move_iterator<ArrayPtr<Type>>& inp) : data(inp) {}
-
 	template<typename U>
 	ArrayPtr(const ArrayPtr<U>& inp) noexcept : data(inp.data) {}
-	//~ArrayPtr() noexcept { delete[] data; }
+	ArrayPtr(Type* inp) noexcept : data(inp) {}
 
-	ArrayPtr& operator=(const ArrayPtr& rhs) {
-		data = rhs.data;
-		return *this;
+	ArrayPtr(const ArrayPtr& inp) noexcept = delete;
+	ArrayPtr& operator=(const ArrayPtr& rhs) = delete;
+
+	ArrayPtr(ArrayPtr&& inp) noexcept : data(inp.Release()) {}
+	ArrayPtr(size_t size) noexcept : data(new Type[size]) {}
+
+	//ArrayPtr(const ArrayPtr& inp) noexcept : data(inp.data) {}
+	//ArrayPtr(std::move_iterator<ArrayPtr<Type>>& inp) : data(inp) {}
+
+
+	~ArrayPtr() noexcept { delete[] data; }
+
+	Type* Release() {
+		auto it = data;
+		data = nullptr;
+		return it;
 	}
+	
 	ArrayPtr& operator=(ArrayPtr&& rhs) {
-		data = std::move(rhs.data);
+		data = rhs.Release();
 		return *this;
 	}
+
+	//+- Операции не могут осуществляться с умными указателями
+	/*
 	ArrayPtr& operator++ () noexcept {
 		++data;
 		return *this;
@@ -56,7 +68,7 @@ public:
 	ArrayPtr operator- (int value)  const noexcept {
 		return ArrayPtr(data - value);
 	}
-
+	*/
 	Type& operator[] (int value) const {
 		return *(data + value);
 	}
