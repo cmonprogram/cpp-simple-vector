@@ -95,11 +95,10 @@ public:
         if (new_capacity > capacity_) {
 
             ArrayPtr<Type> copy(new_capacity + 1);
-            Iterator beginp(copy.Get());
-            Iterator endp(copy.Get());
+            Iterator iter(copy.Get());
             for (size_t i = 0; i < size_; ++i) {
-                *endp = std::move(first[i]); //копирование элементов текущего массива
-                ++endp;
+                *iter = std::move(first[i]); //копирование элементов текущего массива
+                ++iter;
             }
             first = std::move(copy);
             capacity_ = new_capacity;
@@ -240,14 +239,14 @@ public:
 
     // Возвращает ссылку на элемент с индексом index
     Type& operator[](size_t index) noexcept {
-        assert(index >= 0 && index < size_);
+        assert(index < size_);
         return *(begin() + index);
     }
 
     // Возвращает константную ссылку на элемент с индексом index
     const Type& operator[](size_t index) const noexcept {
         //Проверка на корректность index
-        assert(index >= 0 && index < size_);
+        assert(index < size_);
         return *(begin() + index);
     }
 
