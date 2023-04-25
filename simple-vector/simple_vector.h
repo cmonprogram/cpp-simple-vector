@@ -43,21 +43,23 @@ public:
 
     // Создаёт вектор из size элементов, инициализированных значением value
     SimpleVector(size_t size, const Type& value) {
-        Resize(size);
-        std::fill(begin(), end(), value);
+        Reserve(size);
+        std::fill(begin(), begin() + size, value);
         size_ = size;
     }
 
     // Создаёт вектор из std::initializer_list
     SimpleVector(std::initializer_list<Type> init) {
-        Resize(init.size());
+        Reserve(init.size());
         std::copy(init.begin(), init.end(), begin());
+        size_ = init.size();
     }
 
     // Конструктор копирования
     SimpleVector(const SimpleVector& init) {
-        Resize(init.GetSize());
+        Reserve(init.GetSize());
         std::copy(init.begin(), init.end(), begin());
+        size_ = init.GetSize();
     }
 
     // Конструктор перемещения
@@ -70,7 +72,6 @@ public:
         init.capacity_ = 0;
         */
         swap(init);
-         
     }
 
     SimpleVector& operator=(const SimpleVector& rval) {
@@ -146,18 +147,18 @@ public:
 
         size_t position = pos - begin();
         if (size_ + 1 > capacity_) {
-            if (size_ != 0) { 
-                Reserve(size_ * 2); 
+            if (size_ != 0) {
+                Reserve(size_ * 2);
             }
-            if (size_ == 0) { 
-                Reserve(1); 
+            if (size_ == 0) {
+                Reserve(1);
             }
         }
 
         std::move_backward(begin() + position, end(), end() + 1);
         first[position] = std::move(value);
         ++size_;
-        return Iterator(begin() + position);
+        return begin() + position;
     }
 
     Iterator Insert(ConstIterator pos, const Type& value) {
@@ -177,7 +178,7 @@ public:
         std::move_backward(begin() + position, end(), end() + 1);
         first[position] = value;
         ++size_;
-        return Iterator(begin() + position);
+        return begin() + position;
     }
 
     // "Удаляет" последний элемент вектора. Вектор не должен быть пустым
@@ -199,7 +200,7 @@ public:
         }
         else {
             int position = pos - begin();
-            std::move((begin() + position +1), end(), begin() + position);
+            std::move((begin() + position + 1), end(), begin() + position);
             --size_;
         }
         size_t index = pos - begin();
@@ -272,7 +273,7 @@ public:
     // Изменяет размер массива.
     // При увеличении размера новые элементы получают значение по умолчанию для типа Type
     void Resize(size_t new_size) {
-        if (new_size <= size_ ) {
+        if (new_size <= size_) {
             size_ = new_size;
             return;
         }
@@ -330,7 +331,7 @@ private:
 template <typename Type>
 inline bool operator==(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
     //Проверяет, что две последовательности одинаковой длины равны
-    return lhs.GetSize() == rhs.GetSize() && std::equal(lhs.begin(), lhs.end(), rhs.begin()); 
+    return lhs.GetSize() == rhs.GetSize() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 template <typename Type>

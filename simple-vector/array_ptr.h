@@ -11,11 +11,7 @@ public:
 	using reference = Type&;
 	using pointer = Type*;
 	*/
-	template<typename U>
-	friend class ArrayPtr;
 
-	template<typename U>
-	ArrayPtr(const ArrayPtr<U>& inp) noexcept : data(inp.data) {}
 	ArrayPtr(Type* inp) noexcept : data(inp) {}
 
 	ArrayPtr(const ArrayPtr& inp) noexcept = delete;
